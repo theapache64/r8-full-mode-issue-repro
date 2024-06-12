@@ -1,5 +1,7 @@
 # r8-full-mode-issue-repro
 
+- Repro for https://issuetracker.google.com/issues/296794693#
+
 **Reproducible Issue with R8's `fullMode` in Kotlin Android Project**
 
 ![image](https://github.com/theapache64/r8-full-mode-issue-repro/assets/9678279/c76a5662-98cc-4351-bc69-51485c9c4124)
