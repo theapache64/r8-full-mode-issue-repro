@@ -1,24 +1,41 @@
-package com.example.flowobjectrepro
+package com.example.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.flowobjectrepro.ui.theme.R8FullModeReproTheme
+import com.example.app.event.FruitsLog
+import com.example.app.ui.theme.R8FullModeReproTheme
+import kotlinx.coroutines.launch
+
+
+class Audi(val name: String, val year: Int)
+class BMW(val name: String, val year: Int )
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        println("BMW: ${BMW("X3", 2024)}")
+        println("Audi: ${Audi("Q3", 2024)}")
 
         val fruit: Fruit = Fruit.Cherry
         when (fruit) {
@@ -73,6 +90,12 @@ class MainActivity : ComponentActivity() {
             Fruit.Watermelon -> println("I am Watermelon")
         }
 
+        val myFruits = listOf(
+            Fruit.Mango::class,
+            Fruit.Apple::class,
+        )
+
+
         setContent {
             R8FullModeReproTheme {
                 // A surface container using the 'background' color from the theme
@@ -81,10 +104,48 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Box(
-                        modifier = Modifier.fillMaxSize().padding(20.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(20.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(lineHeight = 20.sp, text = fruit.toString(), fontSize = 20.sp)
+                        Column {
+                            Text(
+                                lineHeight = 20.sp,
+                                text = "This should be cherry: $fruit",
+                                fontSize = 20.sp
+                            )
+
+                            val fruitsLog = remember { FruitsLog() }
+                            var fruitReceived by remember { mutableStateOf<Fruit>(Fruit.Kiwi) }
+                            val scope = rememberCoroutineScope()
+                            LaunchedEffect(Unit) {
+                                fruitsLog.fruits().collect { fruit ->
+                                    if (fruit != null) {
+                                        fruitReceived = fruit
+
+                                        if (myFruits.contains(fruit::class)) {
+                                            println("QuickTag: MainActivity:onCreate: cherry present in [mango, apple]")
+                                        }
+                                    }
+
+
+                                }
+                            }
+                            Button(
+                                onClick = {
+                                    scope.launch {
+                                        fruitsLog.emit(Fruit.Cherry)
+                                    }
+                                }
+                            ) {
+                                Text(text = "Emit cherry")
+                            }
+
+                            Text("Received fruit: isCherry 🍒? -> ${fruitReceived::class}")
+                        }
+
+
                     }
                 }
             }

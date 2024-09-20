@@ -1,4 +1,4 @@
-package com.example.flowobjectrepro
+package com.example.app
 
 sealed interface Fruit {
     object Apple : Fruit
