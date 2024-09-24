@@ -1,19 +1,30 @@
 package com.example.app
 
+import android.app.Activity
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import android.widget.TextView
+import com.google.gson.Gson
+import kotlin.reflect.cast
 
-
-class Audi(val name: String, val year: Int, val newParam : Double)
-class BMW(val name: String, val year: Int)
-
-class MainActivity : ComponentActivity() {
+class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.main)
 
-        println("BMW: ${BMW("X3", 2024)}")
-        println("Audi: ${Audi("Q3", 2024, 0.5f)}")
+        val inputJson = """
+            {
+              "make": "Toyota",
+              "model": "Corolla",
+              "year": 2022,
+              "color": "Blue"
+            }
+        """.trimIndent()
+
+        val tvSample = findViewById<TextView>(R.id.tv_sample)
+        val car = Gson().fromJson(inputJson, Car::class.java)
+        tvSample.text = car.make
+
     }
 }
 
